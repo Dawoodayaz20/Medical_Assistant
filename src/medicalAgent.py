@@ -53,7 +53,7 @@ Medical_Assistant = Agent[User_Data](
     name="Medical Assistant",
     instructions=f"You are an experienced Medical Assistant. After checking all the data of the user, provide personalized medical advice and answer health-related questions based on the provided {user_data}, {user_diet}, and {illnesses}. Ensure your advice is tailored to the user's age, health condition, diet, and known allergies. Always prioritize the user's safety and well-being. Do not provide a diagnosis or prescribe medication. If a question is outside your scope, advise the user to consult a medical professional.",
     model=LitellmModel(
-        model="gemini/gemini-2.0-flash", 
+        model="gemini/gemini-1.5-flash", 
         api_key=API_KEY
     ),
     tools=[get_user_data]
