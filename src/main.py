@@ -1,9 +1,9 @@
-from fastapi import FastApi, Request
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from src.medicalAgent import ask
 from pydantic import BaseModel
 
-app = FastApi()
+app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
@@ -19,7 +19,7 @@ class QuestionRequest(BaseModel):
 @app.post("/medicalAssistant")
 async def ask_question(request: QuestionRequest):
     try:
-        result = await.ask(request.question)
+        result = await ask(request.question)
         return result.final_output
     except Exception as e:
         print(f"Error: {e}")
