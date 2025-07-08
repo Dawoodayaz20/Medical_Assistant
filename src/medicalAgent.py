@@ -6,6 +6,8 @@ import os
 
 set_tracing_disabled(disabled=True)
 
+API_KEY = os.getenv("API_KEY")
+
 @dataclass
 class Profile:
   name: str
