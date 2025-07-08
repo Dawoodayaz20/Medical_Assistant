@@ -61,5 +61,5 @@ async def ask():
   result = await Runner.run(Medical_Assistant, "What preventive measures can be taken for my pollen allergies?")
   return result.final_output
 
-if __name__ == "__main__":
-  print(await ask())
+# if __name__ == "__main__":
+#   print(await ask())
