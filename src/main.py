@@ -20,7 +20,7 @@ class QuestionRequest(BaseModel):
 async def ask_question(request: QuestionRequest):
     try:
         result = await ask(request.question)
-        return result.final_output
+        return result
     except Exception as e:
         print(f"Error: {e}")
         return {"error": str(e)}
