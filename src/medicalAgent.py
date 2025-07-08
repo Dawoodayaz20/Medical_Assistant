@@ -59,8 +59,8 @@ Medical_Assistant = Agent[User_Data](
     tools=[get_user_data]
 )
 
-async def ask():
-  result = await Runner.run(Medical_Assistant, "What preventive measures can be taken for my pollen allergies?")
+async def ask(question: str):
+  result = await Runner.run(Medical_Assistant, question)
   return result.final_output
 
 # if __name__ == "__main__":
