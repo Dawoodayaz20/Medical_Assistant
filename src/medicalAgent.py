@@ -1,4 +1,4 @@
-from agents import Agent, Runner, set_tracing_disabled, function_tool
+from agents import Agent, Runner, set_tracing_disabled, function_tool, RunContextWrapper
 from agents.extensions.models.litellm_model import LitellmModel
 from dataclasses import dataclass
 from pydantic import BaseModel
