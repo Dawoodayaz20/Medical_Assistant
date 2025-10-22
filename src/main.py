@@ -17,9 +17,9 @@ class QuestionRequest(BaseModel):
     question: str
 
 @app.post("/medicalAssistant")
-async def ask_question(request: QuestionRequest):
+async def ask_question(request: QuestionRequest, userId: str):
     try:
-        result = await ask(request.question)
+        result = await kickoff(request.question, userId)
         return result
     except Exception as e:
         print(f"Error: {e}")
