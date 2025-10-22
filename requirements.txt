@@ -1,5 +1,5 @@
 uvicorn
 fastapi
 openai-agents
-mcp
+appwrite
 requests
