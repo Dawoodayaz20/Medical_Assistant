@@ -2,7 +2,7 @@ from agents import Agent, Runner, function_tool, RunContextWrapper, RunHooks, Ag
 from dataclasses import dataclass
 from dotenv import load_dotenv, find_dotenv
 from src.appwrite_db import db
-from appwrite import Query
+from appwrite.query import Query
 import os
 
 set_tracing_disabled(disabled=True)
