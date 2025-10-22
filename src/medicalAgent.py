@@ -100,38 +100,36 @@ class UserData:
 # illnesses = Illnesses(allergies_types=["Wheat allergy", "Lactose intolerant", "Gluten intolerance" ,"Pollen Allergy"])
 
 async def kickoff(question: str, userID: str):
+    load_dotenv(find_dotenv())
+    user_data = UserData(userId=userID)
+    mcp_params = MCPServerStreamableHttpParams(url=MCP_SERVER_URL)
 
-  load_dotenv(find_dotenv())
+    async with MCPServerStreamableHttp(params=mcp_params, name="MCPServerClient") as mcp_server_client:
+        try:
+            Medical_Assistant: Agent = Agent[user_data](
+                name="Medical Assistant",
+                instructions=f"You are an experienced Medical Assistant. By using {user_data} to access the database, assist the users.",
+                model=model,
+                mcp_servers=[mcp_server_client]
+            )
 
-  user_data = UserData(userId = userID)
+            print(f"Agent '{Medical_Assistant.name}' initialized with MCP server: '{mcp_server_client.name}'.")
 
-  mcp_params = MCPServerStreamableHttpParams(url=MCP_SERVER_URL)
+            result = await Runner.run(
+                Medical_Assistant,
+                question,
+                context=user_data,
+                run_config=config
+            )
 
-  async with MCPServerStreamableHttp(params=mcp_params, name="MCPServerClient") as mcp_server_client:
-    
-    try:
-      Medical_Assistant: Agent = Agent[user_data](
-      name="Medical Assistant",
-      instructions=f"You are an experienced Medical Assistant. By using the {user_data} to access the database, assist the users.",
-      model=model,
-      mcp_servers=[mcp_server_client]
-      )
+            # Close any remaining async tasks before exit
+            await mcp_server_client.aclose()
+            print(result.final_output)
+            return result.final_output
 
-      print(f"Agent '{Medical_Assistant.name}' initialized with MCP server: '{mcp_server_client.name}'.")
-
-      result = await Runner.run(
-        Medical_Assistant, 
-        question,
-        context=user_data,
-        run_config=config
-      )
-      print(result.final_output)
-      return result.final_output
-    except Exception as e:
-      print(f"There was an error connecting the Server:{e}")
-
-if __name__ == "__main__":
-  asyncio.run(kickoff())
+        except Exception as e:
+            print(f"There was an error connecting the Server: {e}")
+            return {"error": str(e)}
 
 
 # ". After checking all the data of the user, provide personalized medical advice and answer health-related questions based on the provided {user_data}, {user_diet}, and {illnesses}. Ensure your advice is tailored to the user's age, health condition, diet, and known allergies. Always prioritize the user's safety and well-being. Do not provide a diagnosis or prescribe medication. If a question is outside your scope, advise the user to consult a medical professional."
