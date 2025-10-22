@@ -99,7 +99,12 @@ class UserData:
 # user_diet = Diet(breakfast="Rice Flakes", brunch="Two boiled eggs", lunch="Boiled Apple", dinner="Fresh cooked Pumpkin", before_sleep="PediaSure Vanilla")
 # illnesses = Illnesses(allergies_types=["Wheat allergy", "Lactose intolerant", "Gluten intolerance" ,"Pollen Allergy"])
 
-async with MCPServerStreamableHttp(params=mcp_params, name="MCPServerClient") as mcp_server_client:
+async def kickoff(question: str, userID: str):
+    load_dotenv(find_dotenv())
+    user_data = UserData(userId=userID)
+    mcp_params = MCPServerStreamableHttpParams(url=MCP_SERVER_URL)
+    
+    async with MCPServerStreamableHttp(params=mcp_params, name="MCPServerClient") as mcp_server_client:
         try:
             Medical_Assistant: Agent = Agent[UserData](
                 name="Medical Assistant",
