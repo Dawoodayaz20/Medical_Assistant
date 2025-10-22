@@ -22,5 +22,5 @@ async def ask_question(request: QuestionRequest, userId: str):
         result = await kickoff(request.question, userId)
         return result
     except Exception as e:
-        print(f"Error: {e}")
+        print(f"There was an error running your request: {e}")
         return {"error": str(e)}
