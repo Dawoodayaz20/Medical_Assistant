@@ -1,3 +1,5 @@
 uvicorn
 fastapi
-openai-agents[litellm]
+openai-agents
+mcp
+requests
