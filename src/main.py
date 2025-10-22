@@ -15,11 +15,12 @@ app.add_middleware(
 
 class QuestionRequest(BaseModel):
     question: str
+    userId: str
 
 @app.post("/medicalAssistant")
-async def ask_question(request: QuestionRequest, userId: str):
+async def ask_question(request: QuestionRequest):
     try:
-        result = await kickoff(request.question, userId)
+        result = await kickoff(request.question, request.userId)
         return result
     except Exception as e:
         print(f"There was an error running your request: {e}")
