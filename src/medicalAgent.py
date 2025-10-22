@@ -99,16 +99,11 @@ class UserData:
 # user_diet = Diet(breakfast="Rice Flakes", brunch="Two boiled eggs", lunch="Boiled Apple", dinner="Fresh cooked Pumpkin", before_sleep="PediaSure Vanilla")
 # illnesses = Illnesses(allergies_types=["Wheat allergy", "Lactose intolerant", "Gluten intolerance" ,"Pollen Allergy"])
 
-async def kickoff(question: str, userID: str):
-    load_dotenv(find_dotenv())
-    user_data = UserData(userId=userID)
-    mcp_params = MCPServerStreamableHttpParams(url=MCP_SERVER_URL)
-
-    async with MCPServerStreamableHttp(params=mcp_params, name="MCPServerClient") as mcp_server_client:
+async with MCPServerStreamableHttp(params=mcp_params, name="MCPServerClient") as mcp_server_client:
         try:
-            Medical_Assistant: Agent = Agent[user_data](
+            Medical_Assistant: Agent = Agent[UserData](
                 name="Medical Assistant",
-                instructions=f"You are an experienced Medical Assistant. By using {user_data} to access the database, assist the users.",
+                instructions=f"You are an experienced Medical Assistant. Use the provided user data (userId={user_data.userId}) to access the database and assist the user.",
                 model=model,
                 mcp_servers=[mcp_server_client]
             )
@@ -122,8 +117,7 @@ async def kickoff(question: str, userID: str):
                 run_config=config
             )
 
-            # Close any remaining async tasks before exit
-            await mcp_server_client.aclose()
+            # The context manager will close mcp_server_client when exiting the block.
             print(result.final_output)
             return result.final_output
 
