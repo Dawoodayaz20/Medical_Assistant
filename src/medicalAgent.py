@@ -5,9 +5,11 @@ from src.appwrite_db import db
 from appwrite.query import Query
 import os
 
+load_dotenv(find_dotenv())
 set_tracing_disabled(disabled=True)
 
 API_KEY = os.getenv("API_KEY")
+DOC_ID = os.getenv("APPWRITE_DOC_ID")
 
 external_client = AsyncOpenAI(
     api_key=API_KEY,
@@ -28,7 +30,6 @@ config = RunConfig(
 @dataclass
 class UserData:
   userId : str
-
 
 @function_tool
 def get_user_notes(userId: str):
