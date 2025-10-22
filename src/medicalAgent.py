@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from dotenv import load_dotenv, find_dotenv
 from appwrite_db import db
 from appwrite import Query
-import os, asyncio
+import os
 
 set_tracing_disabled(disabled=True)
 
@@ -46,31 +46,27 @@ def get_user_notes(userId: str):
 # user_data = Profile(name="Zulkifl", age=7.5, health_condition="CP Child")
 # user_diet = Diet(breakfast="Rice Flakes", brunch="Two boiled eggs", lunch="Boiled Apple", dinner="Fresh cooked Pumpkin", before_sleep="PediaSure Vanilla")
 # illnesses = Illnesses(allergies_types=["Wheat allergy", "Lactose intolerant", "Gluten intolerance" ,"Pollen Allergy"])
-
 async def kickoff(question: str, userID: str):
-    load_dotenv(find_dotenv())
-    user_data = UserData(userId=userID)
 
-    try:
-        Medical_Assistant: Agent = Agent[UserData](
-            name="Medical Assistant",
-            instructions=f"You are an experienced Medical Assistant. Use the provided user data (userId={user_data.userId}) to access the database and assist the user.",
-            model=model,
-            tools=[get_user_notes],
-        )
-        
-        result = await Runner.run(
-            Medical_Assistant,
-            question,
-            context=user_data,
-            run_config=config,
-        )
+  user_data = UserData(userId = userID)
 
-        print(result.final_output)
-        return result.final_output
+  try:
+    Medical_Assistant: Agent = Agent[user_data](
+    name="Medical Assistant",
+    instructions=f"You are an experienced Medical Assistant. Use the provided user data (userId={user_data.userId}) to access the database and assist the user.",
+    model=model,
+    tools=[get_user_notes]
+    )
 
-    except Exception as e:
-        print(f"There was an error connecting the Server: {e}")
-        return {"error": str(e)}
+    result = await Runner.run(
+      Medical_Assistant, 
+      question,
+      context=user_data,
+      run_config=config
+    )
+    print(result.final_output)
+    return result.final_output
+  except Exception as e:
+      print(f"There was an error connecting the Server:{e}")
 
 # ". After checking all the data of the user, provide personalized medical advice and answer health-related questions based on the provided {user_data}, {user_diet}, and {illnesses}. Ensure your advice is tailored to the user's age, health condition, diet, and known allergies. Always prioritize the user's safety and well-being. Do not provide a diagnosis or prescribe medication. If a question is outside your scope, advise the user to consult a medical professional."
