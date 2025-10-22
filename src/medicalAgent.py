@@ -54,7 +54,7 @@ async def kickoff(question: str, userID: str):
   try:
     Medical_Assistant: Agent = Agent[user_data](
     name="Medical Assistant",
-    instructions=f"You are an experienced Medical Assistant. Use the provided user data (userId={user_data.userId}) to access the database and assist the user.",
+    instructions=f"You are an experienced Medical Assistant. By using the {user_data} provided in the context, assist the users.",
     model=model,
     tools=[get_user_notes]
     )
