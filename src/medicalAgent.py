@@ -103,32 +103,38 @@ async def kickoff(question: str, userID: str):
     load_dotenv(find_dotenv())
     user_data = UserData(userId=userID)
     mcp_params = MCPServerStreamableHttpParams(url=MCP_SERVER_URL)
-    
-    async with MCPServerStreamableHttp(params=mcp_params, name="MCPServerClient") as mcp_server_client:
+    mcp_server_client = MCPServerStreamableHttp(params=mcp_params, name="MCPServerClient")
+
+    try:
+        await mcp_server_client.__aenter__()  # manually start connection
+
+        Medical_Assistant: Agent = Agent[UserData](
+            name="Medical Assistant",
+            instructions=f"You are an experienced Medical Assistant. Use the provided user data (userId={user_data.userId}) to access the database and assist the user.",
+            model=model,
+            mcp_servers=[mcp_server_client],
+        )
+
+        print(f"Agent '{Medical_Assistant.name}' initialized with MCP server: '{mcp_server_client.name}'.")
+
+        result = await Runner.run(
+            Medical_Assistant,
+            question,
+            context=user_data,
+            run_config=config,
+        )
+
+        print(result.final_output)
+        return result.final_output
+
+    except Exception as e:
+        print(f"There was an error connecting the Server: {e}")
+        return {"error": str(e)}
+
+    finally:
         try:
-            Medical_Assistant: Agent = Agent[UserData](
-                name="Medical Assistant",
-                instructions=f"You are an experienced Medical Assistant. Use the provided user data (userId={user_data.userId}) to access the database and assist the user.",
-                model=model,
-                mcp_servers=[mcp_server_client]
-            )
-
-            print(f"Agent '{Medical_Assistant.name}' initialized with MCP server: '{mcp_server_client.name}'.")
-
-            result = await Runner.run(
-                Medical_Assistant,
-                question,
-                context=user_data,
-                run_config=config
-            )
-
-            # The context manager will close mcp_server_client when exiting the block.
-            print(result.final_output)
-            return result.final_output
-
-        except Exception as e:
-            print(f"There was an error connecting the Server: {e}")
-            return {"error": str(e)}
-
+            await mcp_server_client.__aexit__(None, None, None)  # manually close connection
+        except Exception as close_err:
+            print(f"Cleanup error: {close_err}")
 
 # ". After checking all the data of the user, provide personalized medical advice and answer health-related questions based on the provided {user_data}, {user_diet}, and {illnesses}. Ensure your advice is tailored to the user's age, health condition, diet, and known allergies. Always prioritize the user's safety and well-being. Do not provide a diagnosis or prescribe medication. If a question is outside your scope, advise the user to consult a medical professional."
