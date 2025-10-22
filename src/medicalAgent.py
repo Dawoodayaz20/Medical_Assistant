@@ -132,9 +132,10 @@ async def kickoff(question: str, userID: str):
         return {"error": str(e)}
 
     finally:
+        # Gracefully handle shutdown — don't raise cleanup errors
         try:
-            await mcp_server_client.__aexit__(None, None, None)  # manually close connection
-        except Exception as close_err:
-            print(f"Cleanup error: {close_err}")
+            await asyncio.wait_for(mcp_server_client.__aexit__(None, None, None), timeout=2)
+        except Exception as cleanup_err:
+            print(f"Cleanup suppressed: {cleanup_err}")
 
 # ". After checking all the data of the user, provide personalized medical advice and answer health-related questions based on the provided {user_data}, {user_diet}, and {illnesses}. Ensure your advice is tailored to the user's age, health condition, diet, and known allergies. Always prioritize the user's safety and well-being. Do not provide a diagnosis or prescribe medication. If a question is outside your scope, advise the user to consult a medical professional."
