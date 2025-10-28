@@ -97,7 +97,7 @@ async def kickoff(question: str, userID: str):
     name="Medical Assistant",
     instructions=f"You are an experienced Medical Assistant. By using the {user_data} provided in the context, assist the users.",
     model=model,
-    tools=[get_user_notes]
+    tools=[get_user_notes, get_user_reminders, get_user_medicines]
     )
 
     result = await Runner.run(
