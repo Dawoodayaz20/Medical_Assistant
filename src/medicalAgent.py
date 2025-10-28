@@ -30,6 +30,9 @@ config = RunConfig(
 @dataclass
 class UserData:
   userId : str
+  name: str
+  age: str
+  gender: str
 
 @function_tool
 def get_user_notes(userId: str):
@@ -44,14 +47,54 @@ def get_user_notes(userId: str):
     except Exception as e:
         print(f"There was an error calling the tool:{e}")
 
-# user_data = Profile(name="Zulkifl", age=7.5, health_condition="CP Child")
-# user_diet = Diet(breakfast="Rice Flakes", brunch="Two boiled eggs", lunch="Boiled Apple", dinner="Fresh cooked Pumpkin", before_sleep="PediaSure Vanilla")
-# illnesses = Illnesses(allergies_types=["Wheat allergy", "Lactose intolerant", "Gluten intolerance" ,"Pollen Allergy"])
+@function_tool
+def get_user_reminders(userId: str):
+    """Fetch user's reminders."""
+    try:
+        result = db.list_documents(
+            DOC_ID, 
+            "reminders",
+            [Query.equal("userID", userId)]
+            )
+        return result["documents"]
+    except Exception as e:
+        print(f"There was an error calling the tool:{e}")
+
+@function_tool
+def get_user_medicines(userId: str):
+    """Fetch user's medicines."""
+    try:
+        result = db.list_documents(
+            DOC_ID, 
+            "medicines",
+            [Query.equal("userID", userId)]
+            )
+        return result["documents"]
+    except Exception as e:
+        print(f"There was an error calling the tool:{e}")
+
 async def kickoff(question: str, userID: str):
 
   user_data = UserData(userId = userID)
 
   try:
+    response = db.list_documents(
+            collection_id="users",
+            database_id=DOC_ID,
+            queries=[Query.equal("userID", userID)]
+            )
+    
+    if response['total'] > 0:
+      doc = response['documents'][0]
+      user_data = UserData(
+        userId=doc['userID'],
+        name=doc['name'],
+        gender=doc['gender'],
+        age=doc['age']
+        )
+    else:
+      user_data = None
+    
     Medical_Assistant: Agent = Agent[user_data](
     name="Medical Assistant",
     instructions=f"You are an experienced Medical Assistant. By using the {user_data} provided in the context, assist the users.",
