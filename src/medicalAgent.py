@@ -75,8 +75,6 @@ def get_user_medicines(userId: str):
 
 async def kickoff(question: str, userID: str):
 
-  user_data = UserData(userId = userID)
-
   try:
     response = db.list_documents(
             collection_id="users",
@@ -87,7 +85,7 @@ async def kickoff(question: str, userID: str):
     if response['total'] > 0:
       doc = response['documents'][0]
       user_data = UserData(
-        userId=doc['userID'],
+        userId=userID,
         name=doc['name'],
         gender=doc['gender'],
         age=doc['age']
